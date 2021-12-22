@@ -39,6 +39,6 @@ class TaskProviderSpec extends Specification {
 	void "takes a list of OptionType"() {
 		expect:
 		provider.optionTypes.size() == 1
-		//provider.optionTypes[0].inputType == OptionType.InputType.TEXT
+		provider.optionTypes[0].inputType == OptionType.InputType.CODE_EDITOR
 	}
 }

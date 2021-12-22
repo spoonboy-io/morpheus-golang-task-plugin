@@ -21,86 +21,128 @@ class GolangTaskService extends AbstractTaskService {
 
 	@Override
 	TaskResult executeLocalTask(Task task, Map opts, Container container, ComputeServer server, Instance instance) {
+		
+		/*String fName = "/tmp/morpheus-log.txt"
+		File cont = new File (fName)
+
+		cont << opts.toString()
+
+		cont << opts.morpheusResults.getResultMap()*/
+
+		task.setResultType("value")
+
+
 		TaskConfig config = buildLocalTaskConfig([:], task, [], opts).blockingGet()
-		if(instance) {
-			config = buildInstanceTaskConfig(instance, [:], task, [], opts).blockingGet()
-		}
-		if(container) {
-			config = buildContainerTaskConfig(container, [:], task, [], opts).blockingGet()
-		}
-	
-		executeTask(task, config)
+		executeTask(task, config, opts)
 	}
 
 	@Override
 	TaskResult executeServerTask(ComputeServer server, Task task, Map opts) {
-		TaskConfig config = buildComputeServerTaskConfig(server, [:], task, [], opts).blockingGet()
-		context.executeCommandOnServer(server, 'echo $JAVA_HOME')
-		context.executeCommandOnServer(server, 'echo $JAVA_HOME', false, 'user', 'password', null, null, null, false, false)
-		executeTask(task, config)
+		return new TaskResult()
 	}
 
 	@Override
 	TaskResult executeServerTask(ComputeServer server, Task task) {
-		TaskConfig config = buildComputeServerTaskConfig(server, [:], task, [], [:]).blockingGet()
-		context.executeCommandOnServer(server, 'echo $JAVA_HOME')
-		executeTask(task, config)
+		return new TaskResult()
 	}
 
 	@Override
 	TaskResult executeContainerTask(Container container, Task task, Map opts) {
-		TaskConfig config = buildContainerTaskConfig(container, [:], task, [], opts).blockingGet()
-		context.executeCommandOnWorkload(container, 'echo $JAVA_HOME')
-		context.executeCommandOnWorkload(container, 'echo $JAVA_HOME', 'user', 'password', null, null, null, false, null, false)
-		executeTask(task, config)
+		return new TaskResult()
 	}
 
 	@Override
 	TaskResult executeContainerTask(Container container, Task task) {
-		TaskConfig config = buildContainerTaskConfig(container, [:], task, [], [:]).blockingGet()
-		executeTask(task, config)
+		return new TaskResult()
 	}
 
 	@Override
 	TaskResult executeRemoteTask(Task task, Map opts, Container container, ComputeServer server, Instance instance) {
-		TaskConfig config = buildRemoteTaskConfig([:], task, [], opts).blockingGet()
-		context.executeCommandOnWorkload(container, 'echo $JAVA_HOME')
-		executeTask(task, config)
+		return new TaskResult()
 	}
 
 	@Override
 	TaskResult executeRemoteTask(Task task, Container container, ComputeServer server, Instance instance) {
-		TaskConfig config = buildRemoteTaskConfig([:], task, [], [:]).blockingGet()
-		context.executeSshCommand('localhost', 8080, 'bob', 'password', 'echo $JAVA_HOME', null, null, null, false, null, LogLevel.debug, false, null, true)
-		executeTask(task, config)
+		return new TaskResult()
 	}
 
-	TaskResult executeTask(Task task, TaskConfig config) {
+	TaskResult executeTask(Task task, TaskConfig config, Map opts) {
+		
+		// get the script
 		def taskOption = task.taskOptions.find { it.optionType.code == 'golangTaskScript' }
 		String data = taskOption.value
-		
+
+
+		// make morpheus vars available
+		def taskJson = opts.taskConfig.encodeAsJson().toString().getBytes().encodeBase64()
+
+		// make result map available
+		String codeHeader = """
+			var results = map[string]string{}
+			var morpheus = map[string]string{}
+			
+			// we use init to populate the maps
+			func init(){
+
+		"""
+
+		// check we have any 
+		if (opts.morpheusResults != null) {
+			Map inputResults = opts.morpheusResults.getResultMap()
+
+			inputResults.each { key, val ->
+				String trimmed = val
+				trimmed = trimmed.replace("\r","").replace("\n","")
+				codeHeader += "results[\"$key\"]= \"$trimmed\"" + "\r\n"
+			}		
+		}
+
+		codeHeader += """
+			
+			}
+
+			func main(){
+		"""
+	
+		// replace
+		def repData = data.replace("func main(){", codeHeader)
+	
 		// create the file
 		Date ts = new Date();
 		String fName = "/tmp/morpheus-task-${ts.getTime()}.go"
 		File container = new File (fName)
 
-		container << data
+		container << repData
 
 		// run it
 		def sout = new StringBuilder()
 		def serr = new StringBuilder()
 		def proc = "go run ${fName}".execute()
 		proc.consumeProcessOutput(sout, serr)
-		proc.waitForOrKill(1000)
+		proc.waitForOrKill(5 * 1000)
 
 		// clean up
 		boolean deleted =  container.delete()  
 
+		// put the result on result map <- this doesn't achieve the chaining hoped for
+		if (opts.morpheusResults != null) {
+			def add = opts.morpheusResults.setResult(task.code, sout.toString())
+		
+			// some temp logging
+			String logName = "/tmp/morpheus-log-${ts.getTime()}.txt"
+			File lg = new File (logName)
+
+			def resOut = opts.morpheusResults.getResultMap()
+			lg << resOut
+		} 
+
 		new TaskResult(
-				success: true,
-				data   : sout,
-				output : sout,
-				error : serr
+			success: true,
+			data   : sout,
+			output : sout,
+			error : serr
 		)
+	
 	}
+	
 }

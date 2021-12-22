@@ -3,6 +3,7 @@ package com.morpheusdata.task
 import com.morpheusdata.core.*
 import com.morpheusdata.model.OptionType
 import com.morpheusdata.model.TaskType
+import com.morpheusdata.model.Task
 
 /**
  * Example TaskProvider
@@ -11,11 +12,15 @@ class GolangTaskProvider implements TaskProvider {
 	MorpheusContext morpheusContext
 	Plugin plugin
 	AbstractTaskService service
+	Task task
 
 	GolangTaskProvider(Plugin plugin, MorpheusContext morpheusContext) {
 		this.plugin = plugin
 		this.morpheusContext = morpheusContext
+		this.task = task
 	}
+
+	
 
 	@Override
 	MorpheusContext getMorpheus() {
@@ -95,4 +100,5 @@ class GolangTaskProvider implements TaskProvider {
 		)
 		return [optionType]
 	}
+
 }

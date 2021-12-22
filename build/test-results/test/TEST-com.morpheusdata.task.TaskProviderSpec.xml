@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.morpheusdata.task.TaskProviderSpec" tests="3" skipped="0" failures="0" errors="0" timestamp="2021-12-17T15:37:49" hostname="Ollies-MacBook-Pro.local" time="0.424">
+<testsuite name="com.morpheusdata.task.TaskProviderSpec" tests="3" skipped="0" failures="0" errors="0" timestamp="2021-12-22T16:25:49" hostname="Ollies-MacBook-Pro.local" time="0.462">
   <properties/>
-  <testcase name="valid provider" classname="com.morpheusdata.task.TaskProviderSpec" time="0.401"/>
-  <testcase name="service instantiated" classname="com.morpheusdata.task.TaskProviderSpec" time="0.01"/>
-  <testcase name="takes a list of OptionType" classname="com.morpheusdata.task.TaskProviderSpec" time="0.012"/>
+  <testcase name="valid provider" classname="com.morpheusdata.task.TaskProviderSpec" time="0.431"/>
+  <testcase name="service instantiated" classname="com.morpheusdata.task.TaskProviderSpec" time="0.013"/>
+  <testcase name="takes a list of OptionType" classname="com.morpheusdata.task.TaskProviderSpec" time="0.017"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
