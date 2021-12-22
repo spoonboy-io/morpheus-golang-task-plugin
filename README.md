@@ -2,10 +2,13 @@
 
 Write Morpheus Automation tasks in Go
 
-- This version does not accept results of other tasks when used in Workflows
+- Results of previous tasks are in a map (var results) and accessible by key
+- Output is not available to subsequent tasks ATM
 - Go must be installed on the appliance
 - Scripts are excuted in using `go run`
 - Only Standard Libary packages work in the current implementation
 
 ## TODO
-- Workflow to build the plugin
+- Make the task output available to subsequent tasks in yhe workflow
+- Make the Morpheus vars available to the task
+- A Github Workflow to build the plugin
