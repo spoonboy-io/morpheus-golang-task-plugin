@@ -1,6 +1,6 @@
 # Golang Morpheus Task Plugin
 
-### Write Morpheus automation tasks in Go.
+### Write Morpheus automation tasks in Go.
 
 Go must be installed on the appliance, and a `/tmp/gocache` folder created which is owned by `morpheus-app` user.
 
