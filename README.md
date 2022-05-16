@@ -2,6 +2,8 @@
 
 ### Write Morpheus automation tasks in Go.
 
+*Work in Progress*
+
 Go must be installed on the appliance, and a `/tmp/gocache` folder created which is owned by `morpheus-app` user.
 
 As of the plugin 0.12.5 framework and 5.5.0 this plugin can now pass output down in a workflow like native Morpheus tasks.
