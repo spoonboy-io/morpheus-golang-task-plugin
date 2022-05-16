@@ -12,6 +12,7 @@ Previous task output can be accessed in the plugin via a results map, the task c
 
 ### Todo
 
+- Logo to the package
 - Figure out how to make the morpheus variable dictionary available to the Go code as well.
 - Test, digesting key/val and JSON output from previous task.
 - Helpers to use in teh Go script to present key/val and JSON output in the format required by Morpheus.
