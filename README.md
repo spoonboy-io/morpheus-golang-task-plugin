@@ -1,7 +1,5 @@
 # Golang Morpheus Task Plugin
 
-### This not production ready code!
-
 Write Morpheus Automation tasks in Go
 
 - Results of previous tasks are in a map (var results) and accessible by key
@@ -11,6 +9,5 @@ Write Morpheus Automation tasks in Go
 - Only Standard Libary packages work in the current implementation
 
 ## TODO
-- Make the task output available to subsequent tasks in yhe workflow
 - Make the Morpheus vars available to the task
 - A Github Workflow to build the plugin

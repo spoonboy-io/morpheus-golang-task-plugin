@@ -4,9 +4,6 @@ import com.morpheusdata.core.AbstractTaskService
 import com.morpheusdata.core.MorpheusContext
 import com.morpheusdata.model.*
 
-/**
- * Example AbstractTaskService. Each method demonstrates building an example TaskConfig for the relevant task type
- */
 class GolangTaskService extends AbstractTaskService {
 	MorpheusContext context
 
@@ -21,17 +18,6 @@ class GolangTaskService extends AbstractTaskService {
 
 	@Override
 	TaskResult executeLocalTask(Task task, Map opts, Container container, ComputeServer server, Instance instance) {
-		
-		/*String fName = "/tmp/morpheus-log.txt"
-		File cont = new File (fName)
-
-		cont << opts.toString()
-
-		cont << opts.morpheusResults.getResultMap()*/
-
-		task.setResultType("value")
-
-
 		TaskConfig config = buildLocalTaskConfig([:], task, [], opts).blockingGet()
 		executeTask(task, config, opts)
 	}
@@ -72,10 +58,6 @@ class GolangTaskService extends AbstractTaskService {
 		def taskOption = task.taskOptions.find { it.optionType.code == 'golangTaskScript' }
 		String data = taskOption.value
 
-
-		// make morpheus vars available
-		def taskJson = opts.taskConfig.encodeAsJson().toString().getBytes().encodeBase64()
-
 		// make result map available
 		String codeHeader = """
 			var results = map[string]string{}
@@ -113,28 +95,20 @@ class GolangTaskService extends AbstractTaskService {
 		File container = new File (fName)
 
 		container << repData
-
-		// run it
+		
 		def sout = new StringBuilder()
 		def serr = new StringBuilder()
-		def proc = "go run ${fName}".execute()
-		proc.consumeProcessOutput(sout, serr)
-		proc.waitForOrKill(5 * 1000)
+		ProcessBuilder pb = new ProcessBuilder("/usr/local/go/bin/go", "run", "${fName}");
+		// set env var for morpheus-app user
+		Map<String, String> env = pb.environment();
+ 		env.put("GOCACHE", "/tmp/gocache");
+		
+		Process p = pb.start();
+		p.consumeProcessOutput(sout, serr)
+		p.waitForOrKill(5 * 1000)
 
 		// clean up
 		boolean deleted =  container.delete()  
-
-		// put the result on result map <- this doesn't achieve the chaining hoped for
-		if (opts.morpheusResults != null) {
-			def add = opts.morpheusResults.setResult(task.code, sout.toString())
-		
-			// some temp logging
-			String logName = "/tmp/morpheus-log-${ts.getTime()}.txt"
-			File lg = new File (logName)
-
-			def resOut = opts.morpheusResults.getResultMap()
-			lg << resOut
-		} 
 
 		new TaskResult(
 			success: true,
