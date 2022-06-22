@@ -34,12 +34,12 @@ class GolangTaskProvider implements TaskProvider {
 
 	@Override
 	ExecutableTaskInterface getService() {
-		return new GolangTaskService(morpheus)
+		return new GolangTaskService(morpheusContext)
 	}
 
 	@Override
 	String getCode() {
-		return "golangTask"
+		return "golang-task"
 	}
 
 	@Override
@@ -74,12 +74,12 @@ class GolangTaskProvider implements TaskProvider {
 
 	@Override
 	Boolean isAllowLocalRepo() {
-		return true
+		return false
 	}
 
 	@Override
 	Boolean isAllowRemoteKeyAuth() {
-		return true
+		return false
 	}
 
 	@Override
@@ -87,17 +87,12 @@ class GolangTaskProvider implements TaskProvider {
 		return true
 	}
 
-	/**
-	 * Builds an OptionType to take some text
-	 * @return list of OptionType
-	 */
 	@Override
 	List<OptionType> getOptionTypes() {
 		OptionType optionType = new OptionType(
 				name: 'golangScript',
 				code: 'golangTaskScript',
 				fieldName: 'golangScriptField',
-				//optionSource: true,
 				displayOrder: 0,
 				fieldLabel: 'Golang Script',
 				required: true,
